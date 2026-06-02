@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neuroevolution Drone Simulator - Interaktif & Real-time</title>
+    <!-- Google Fonts: Outfit & Space Grotesk -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="logo-icon">🧬</div>
+                <div class="logo-text">
+                    <h1>NEUROEVOLUTION</h1>
+                    <span>Interactive Agent Simulator</span>
+                </div>
+            </div>
+            <div class="header-stats">
+                <div class="stat-pill">
+                    <span class="stat-label">Generasi:</span>
+                    <span id="gen-count" class="stat-value text-cyan">1</span>
+                </div>
+                <div class="stat-pill">
+                    <span class="stat-label">Terbaik:</span>
+                    <span id="best-fitness" class="stat-value text-green">0.00</span>
+                </div>
+                <div class="stat-pill">
+                    <span class="stat-label">Sukses:</span>
+                    <span id="success-rate" class="stat-value text-purple">0%</span>
+                </div>
+                <div class="stat-pill">
+                    <span class="stat-label">Hidup:</span>
+                    <span id="alive-count" class="stat-value text-orange">0/0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="app-body">
+            <!-- Left Sidebar: Controls -->
+            <section class="panel controls-panel">
+                <div class="panel-header">
+                    <h2>Kontrol & Parameter</h2>
+                </div>
+                <div class="panel-content scrollable">
+                    <!-- Simulation Controls -->
+                    <div class="control-group">
+                        <h3>Simulasi</h3>
+                        <div class="btn-row">
+                            <button id="btn-play-pause" class="btn btn-primary btn-glow">
+                                <svg class="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Play
+                            </button>
+                            <button id="btn-restart" class="btn btn-secondary">
+                                <svg class="icon" viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg> Reset
+                            </button>
+                        </div>
+                        <div class="slider-container">
+                            <label for="speed-slider">Kecepatan Simulasi: <span id="speed-val">1x</span></label>
+                            <input type="range" id="speed-slider" min="1" max="10" value="1" step="1">
+                        </div>
+                    </div>
+
+                    <!-- Agent Type & Design -->
+                    <div class="control-group">
+                        <h3>Konfigurasi Agen</h3>
+                        <div class="select-container">
+                            <label for="agent-type-select">Jenis Agen:</label>
+                            <select id="agent-type-select">
+                                <option value="drone">🚁 Quadcopter Drone</option>
+                                <option value="car">🚗 Sleek Sports Car</option>
+                                <option value="ant">🐜 Crawling Ant</option>
+                                <option value="fly">🪰 Buzzing Fly</option>
+                                <option value="plane">✈️ Delta Wing Plane</option>
+                            </select>
+                        </div>
+                        <div class="toggle-container">
+                            <input type="checkbox" id="toggle-sensors" checked>
+                            <label for="toggle-sensors">Gambarkan Garis Sensor</label>
+                        </div>
+                        <div class="toggle-container">
+                            <input type="checkbox" id="toggle-best-only">
+                            <label for="toggle-best-only">Hanya Tampilkan Agen Terbaik</label>
+                        </div>
+                    </div>
+
+                    <!-- Evolutionary Settings -->
+                    <div class="control-group">
+                        <h3>Algoritma Genetika</h3>
+                        <div class="slider-container">
+                            <label for="pop-size-slider">Ukuran Populasi: <span id="pop-size-val">100</span></label>
+                            <input type="range" id="pop-size-slider" min="10" max="300" value="100" step="10">
+                        </div>
+                        <div class="slider-container">
+                            <label for="mutation-slider">Tingkat Mutasi: <span id="mutation-val">10%</span></label>
+                            <input type="range" id="mutation-slider" min="1" max="50" value="10" step="1">
+                        </div>
+                        <div class="slider-container">
+                            <label for="sensor-count-slider">Jumlah Sensor Agen: <span id="sensor-count-val">5</span></label>
+                            <input type="range" id="sensor-count-slider" min="3" max="9" value="5" step="2">
+                        </div>
+                    </div>
+
+                    <!-- Interaction & Drawing Mode -->
+                    <div class="control-group">
+                        <h3>Interaksi Canvas</h3>
+                        <div class="radio-group">
+                            <input type="radio" id="mode-draw" name="canvas-mode" value="draw" checked>
+                            <label for="mode-draw">✏️ Gambar Rintangan</label>
+                            
+                            <input type="radio" id="mode-erase" name="canvas-mode" value="erase">
+                            <label for="mode-erase">🧹 Hapus Rintangan</label>
+                            
+                            <input type="radio" id="mode-target" name="canvas-mode" value="target">
+                            <label for="mode-target">🎯 Pindahkan Target</label>
+                        </div>
+                        <div class="slider-container">
+                            <label for="dynamic-obs-slider">Rintangan Bergerak: <span id="dynamic-obs-val">2</span></label>
+                            <input type="range" id="dynamic-obs-slider" min="0" max="8" value="2" step="1">
+                        </div>
+                        <div class="btn-row">
+                            <button id="btn-clear-walls" class="btn btn-danger">Hapus Dinding Gambar</button>
+                        </div>
+                    </div>
+
+                    <!-- Local Storage Weights -->
+                    <div class="control-group">
+                        <h3>Ekspor / Impor Otak</h3>
+                        <div class="btn-row">
+                            <button id="btn-save-brain" class="btn btn-secondary btn-sm">Simpan Terbaik</button>
+                            <button id="btn-load-brain" class="btn btn-secondary btn-sm">Muat Terbaik</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Center Viewport: The Main Simulation Canvas -->
+            <section class="simulation-viewport">
+                <div class="canvas-container">
+                    <canvas id="sim-canvas"></canvas>
+                    <div class="canvas-overlay-text">Klik & seret untuk menggambar dinding rintangan!</div>
+                </div>
+            </section>
+
+            <!-- Right Sidebar: NN Visualizer & Charts -->
+            <section class="panel visualizer-panel">
+                <div class="panel-header">
+                    <h2>Aktivitas Jaringan Saraf (Agen Terbaik)</h2>
+                </div>
+                <div class="panel-content scrollable">
+                    <!-- NN Canvas -->
+                    <div class="visualizer-container">
+                        <canvas id="nn-canvas"></canvas>
+                    </div>
+
+                    <!-- Evolution Progress Graph -->
+                    <div class="chart-container-header">
+                        <h2>Tren Kemajuan Evolusi</h2>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="chart-canvas"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        <span class="legend-item"><span class="legend-color max-fit"></span>Max Fit</span>
+                        <span class="legend-item"><span class="legend-color avg-fit"></span>Avg Fit</span>
+                        <span class="legend-item"><span class="legend-color success"></span>Sukses</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/nn.js"></script>
+    <script src="js/ga.js"></script>
+    <script src="js/obstacle.js"></script>
+    <script src="js/agent.js"></script>
+    <script src="js/visualizer.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/simulator.js"></script>
+</body>
+</html>
